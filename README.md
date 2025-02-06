@@ -1,101 +1,91 @@
-# DataBench Competition - Task 8 (SemEval 2024)
-## Question Answering from Structured Datasets
+# DataBench Question Answering System (SemEval 2024 Task 8)
 
-🚀 A hybrid NLP pipeline for answering dataset-based questions using structured queries and transformer-based QA models.
+## *Introduction*
+This repository contains the implementation of our *DataBench Question Answering System, developed for **SemEval 2024 Task 8*. The system is designed to extract answers from structured datasets provided in the competition, following the constraints that only provided data can be used for answering questions.
 
----
-
-## 📌 Project Overview
-This repository contains the implementation for Task 8 of the SemEval 2024 DataBench Competition, which involves automated question answering from structured datasets.
-
-The primary objective of this competition is to develop a system that can extract accurate answers to given questions using only the provided datasets, without relying on external knowledge.
-
-- 🔹 Our solution combines structured data processing, rule-based extraction, and a transformer-based QA model (BERT) to extract the most relevant answers.
-- 🔹 The methodology follows data preprocessing, structured query-based answering, and contextual LLM inference to ensure maximum accuracy.
-- 🔹 The final predictions are formatted and submitted in the required format (predictions.txt & predictions_lite.txt).
+Our approach leverages *data preprocessing, rule-based extraction, and a transformer-based Question Answering (QA) model* to generate accurate responses for the given questions.
 
 ---
 
-## 📂 Dataset Information
-The competition datasets can be found on the official [https://www.codabench.org/competitions/3360/]
+## *Dataset*
+We utilized the *DataBench dataset*, which consists of multiple structured datasets in .parquet format. Each dataset contains structured tabular data, and questions must be answered using only the provided data.
 
-Upon downloading, will receive:
+🔗 *Dataset Link:* [DataBench (SemEval 2024 Task 8)]https://www.codabench.org/competitions/3360/
 
-- A test_qa.csv file containing questions and dataset references.
-- 15 folders, each representing a different dataset (e.g., 066_IBM_HR, 080_Books, etc.).
-- Each folder contains:
-  - **all.parquet**: Full dataset.
-  - **sample.parquet**: A sample of the full dataset (first 20 rows).
-
----
-
-## 🚀 Approach and Methodology
-### Step 1: Data Preprocessing
-- Converted all.parquet and sample.parquet files into *cleaned CSV files* (cleaned_all.csv, cleaned_sample.csv).
-- Applied *dataset-specific preprocessing* to standardize text fields, handle missing values, and ensure numerical consistency.
-- *Key processing tasks included:*
-  - *Text Standardization:* Lowercasing, trimming, and handling special characters.
-  - *Handling Missing Values:* Filling NaNs with appropriate placeholders (Unknown, 0, etc.).
-  - *Numerical Conversion:* Ensuring proper numeric formats for calculations.
-  - *Feature Extraction:* Extracting relevant columns for structured queries.
-
-### Step 2: Answer Extraction
-Two different methods were used to extract answers:
-
-#### 📌 1️⃣ Structured Query-Based Answering
-- For *simple numerical or categorical questions, a **rule-based approach* was used.
-- Used *TF-IDF similarity* to match question keywords with dataset column names.
-- Applied *direct lookup and aggregation*:
-  - *Boolean Questions:* Checking conditions (Yes/No).
-  - *Numerical Answers:* Extracting max, min, avg, sum, etc.
-  - *List-Based Answers:* Ranking items based on frequency.
-
-#### 📌 2️⃣ Transformer-Based Question Answering
-- Used **bert-large-uncased-whole-word-masking-finetuned-squad** as the *fallback for complex queries*.
-- Extracted *relevant dataset context* and *fed it into the QA model* for inference.
-- Applied *answer length restrictions* and *score filtering* to avoid incorrect outputs.
-
-### Step 3: Answer Formatting
-- *Ensured competition-compliant output formats*:
-  - *Boolean:* "Yes" / "No".
-  - *Number:* Integer or floating-point values.
-  - *Category:* Most frequent categorical value.
-  - *List:* Properly formatted ['item1', 'item2'].
-- Saved results to:
-  - predictions.txt (for all.parquet datasets).
-  - predictions_lite.txt (for sample.parquet datasets).
-- Compressed and submitted the final **Enhanced_Archive.zip**.
+Each dataset is structured as follows:
+- all.parquet - The full dataset.
+- sample.parquet - A small subset (first 20 rows) of the dataset.
+- test_qa.csv - Contains the questions and corresponding dataset identifiers.
 
 ---
 
-## 📌 Technologies Used
-| Tool/Library  | Purpose  |
-|--------------|----------|
-| *Pandas*  | Dataset loading and structured querying |
-| *NumPy*  | Numerical operations and aggregations |
-| *Hugging Face Transformers*  | BERT-based QA inference |
-| *Scikit-learn (TF-IDF)*  | Column similarity matching |
-| *Regex & NLTK*  | Text normalization and pattern matching |
-| *Zipfile*  | File packaging for submission |
+## *Methodology*
+### *1. Data Preprocessing*
+Before running the model, we preprocess the data for consistency and efficiency. The steps include:
+- *Conversion*: We convert all.parquet and sample.parquet into structured CSV files (cleaned_all.csv and cleaned_sample.csv).
+- *Cleaning & Normalization*: Missing values are handled appropriately:
+  - Categorical values are filled with 'Unknown'.
+  - Numerical values are filled using *median imputation*.
+  - Text columns are standardized (lowercasing, trimming extra spaces).
+- *Feature Engineering*: Extracting key numerical and categorical statistics to aid question-answering.
+- *Text Normalization*: We apply stemming, lemmatization, and remove special characters for better matching.
+
+### *2. Question Answering Pipeline*
+Our system processes each question from test_qa.csv and determines the appropriate extraction method. We use a *hybrid approach* consisting of:
+
+#### *A) Rule-Based Question Answering*
+We extract answers directly from structured datasets using logical rules:
+- *Boolean Questions (Yes/No)*:
+  - If the question contains words like Is, Does, Can, Are, we check the dataset conditionally.
+  - Example: "Is the highest DailyRate negative?" → Check if max(DailyRate) < 0.
+- *Numerical & Statistical Questions*:
+  - Sum, average, min/max, median values are computed for relevant fields.
+  - Example: "What is the average employee age?" → Compute mean(Age).
+- *Category Extraction*:
+  - The most frequent category from a column is retrieved.
+  - Example: "What is the most common author in the dataset?" → Find mode(Author).
+- *List-Based Answers*:
+  - For ranking-based queries (e.g., "List the top 3 players by points"), we use nlargest() on numerical columns.
+
+#### *B) Transformer-Based QA Model*
+If rule-based extraction fails, we fall back to a *pretrained transformer model*:
+- Model Used: [deepset/bert-base-cased-squad2](https://huggingface.co/deepset/bert-base-cased-squad2) (110M parameters)
+- *How it Works*:
+  - Extracts relevant *context* from the dataset.
+  - Passes the context and question to BERT for answer generation.
+  - Example: "Who is the top player in the NBA dataset?" → BERT extracts the best match.
+- The QA model runs in a *zero-shot setting* (no fine-tuning was done).
+
+### *3. Output Formatting & Submission*
+The extracted answers are stored in:
+- predictions.txt → Answers for full datasets.
+- predictions_lite.txt → Answers for sample.parquet datasets.
+
+Both files are compressed into Archive.zip and submitted to the competition platform.
 
 ---
 
-## ⚡ Model Details
-| Model  | Description  |
-|--------|-------------|
-| **bert-large-uncased-whole-word-masking-finetuned-squad**  | Transformer-based QA model trained on SQuAD v2 (340M parameters). Used for extracting answers from structured text data. |
+## *Results & Observations*
+Our hybrid approach ensures:
+
+✅ *Fast rule-based processing for structured queries*
+
+✅ *Robust extraction using NLP for ambiguous questions*
+
+✅ *High accuracy using structured statistical methods*
 
 ---
 
-## 💡 Key Features & Enhancements
-✅ *Multi-Step Processing Pipeline*: Preprocessing → Query Matching → QA Model → Answer Formatting.  
-✅ *Hybrid Approach: Combines **structured querying + transformer inference*.  
-✅ *TF-IDF Similarity Matching*: To dynamically identify relevant columns.  
-✅ *Robust Data Cleaning: Dataset-specific preprocessing for **better accuracy*.  
-✅ *Competition-Compliant Formatting: Ensures **valid answers in required formats*.  
-✅ *Parallel Execution & GPU Support*: Optimized for faster processing.  
+## *Future Improvements*
+We plan to enhance our system by Trial and Error can :
+- Integrating *BM25 retrieval* for better matching.
+- Exploring *T5-based generative answering models*.
+- Parallelizing data processing for speed improvements.
+
 
 ---
 
+## *Acknowledgments*
+We thank the *SemEval 2024 Task 8 organizers* for providing the dataset and defining this challenge.
 
-
+---
