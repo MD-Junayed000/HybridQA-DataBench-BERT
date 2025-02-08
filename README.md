@@ -1,14 +1,14 @@
 # DataBench Question Answering System (SemEval 2024 Task 8)
 
 ## *Introduction*
-This repository contains the implementation of our *DataBench Question Answering System, developed for **SemEval 2024 Task 8*. The system is designed to extract answers from structured datasets provided in the competition, following the constraints that only provided data can be used for answering questions.
+This repository contains the implementation of our **DataBench Question Answering System,** developed for **SemEval 2024 Task 8**. The system is designed to extract answers from structured datasets provided in the competition, following the constraints that only provided data can be used for answering questions.
 
-Our approach leverages *data preprocessing, rule-based extraction, and a transformer-based Question Answering (QA) model* to generate accurate responses for the given questions.
+Our approach combines **data preprocessing, rule-based extraction, and a transformer-based Question Answering (QA) model** to ensure high accuracy in responses. The system is capable of handling multiple question formats, ranging from boolean to numerical and categorical queries.
 
 ---
 
 ## *Dataset*
-We utilized the *DataBench dataset*, which consists of multiple structured datasets in .parquet format. Each dataset contains structured tabular data, and questions must be answered using only the provided data.
+We utilized the **DataBench dataset**, which consists of multiple structured datasets in .parquet format. Each dataset contains structured tabular data, and questions must be answered using only the provided data.
 
 🔗 *Dataset Link:* [DataBench (SemEval 2024 Task 8)]https://www.codabench.org/competitions/3360/
 
@@ -17,21 +17,22 @@ Each dataset is structured as follows:
 - sample.parquet - A small subset (first 20 rows) of the dataset.
 - test_qa.csv - Contains the questions and corresponding dataset identifiers.
 
+The competition consists of 15 datasets, each representing a different domain such as HR analytics, finance, sports, healthcare, and more.
 ---
 
 ## *Methodology*
 ### *1. Data Preprocessing*
 Before running the model, we preprocess the data for consistency and efficiency. The steps include:
-- *Conversion*: We convert all.parquet and sample.parquet into structured CSV files (cleaned_all.csv and cleaned_sample.csv).
-- *Cleaning & Normalization*: Missing values are handled appropriately:
+- **Conversion**: We convert all.parquet and sample.parquet into structured CSV files (cleaned_all.csv and cleaned_sample.csv).
+- **Cleaning & Normalization**: Missing values are handled appropriately:
   - Categorical values are filled with 'Unknown'.
   - Numerical values are filled using *median imputation*.
   - Text columns are standardized (lowercasing, trimming extra spaces).
-- *Feature Engineering*: Extracting key numerical and categorical statistics to aid question-answering.
-- *Text Normalization*: We apply stemming, lemmatization, and remove special characters for better matching.
+- **Feature Engineering**: Extracting key numerical and categorical statistics to aid question-answering.
+- **Text Normalization**: We apply stemming, lemmatization, and remove special characters for better matching.
 
 ### *2. Question Answering Pipeline*
-Our system processes each question from test_qa.csv and determines the appropriate extraction method. We use a *hybrid approach* consisting of:
+Our system processes each question from test_qa.csv and determines the appropriate extraction method. We use a **hybrid approach** consisting of:
 
 #### *A) Rule-Based Question Answering*
 We extract answers directly from structured datasets using logical rules:
@@ -86,6 +87,6 @@ We plan to enhance our system by Trial and Error can :
 ---
 
 ## *Acknowledgments*
-We thank the *SemEval 2024 Task 8 organizers* for providing the dataset and defining this challenge.
+We thank the **SemEval 2024 Task 8 organizers** for providing the dataset and defining this challenge.Their work has contributed significantly to advancing question answering on structured data.
 
 ---
