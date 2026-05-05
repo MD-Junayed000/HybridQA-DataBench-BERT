@@ -1,15 +1,5 @@
 # DataBench Question Answering System (SemEval 2024 Task 8)
 
-## Topics
-- question-answering
-- bert
-- transformers
-- tabular-data
-- semeval-2024
-- databench
-- nlp
-- python
-
 ## Overview
 This repository contains the implementation of our **DataBench Question Answering System** for **SemEval 2024 Task 8**. The system extracts answers from structured datasets provided in the competition and combines **data preprocessing, rule-based extraction, and a transformer-based QA model** to cover boolean, numerical, categorical, and list-based questions.
 
